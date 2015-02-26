@@ -40,4 +40,4 @@ RUN mkdir -p /var/downlink
 
 ONBUILD ADD config.yml /etc/downlink/config.yml
 
-RUN /usr/local/ruby/bin/gem install dshell -s https://repo.fury.io/silarsis/ -v 0.1.5
+RUN /usr/local/ruby/bin/gem install dshell -s https://repo.fury.io/silarsis/ -v 0.1.6
