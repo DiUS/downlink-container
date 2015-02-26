@@ -24,12 +24,20 @@ RUN addgroup ruby \
 RUN mkdir /var/run/sshd
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 RUN echo '\nAllowUsers downlink\n' >> /etc/ssh/sshd_config
+RUN echo '\nexport PATH=/usr/local/ruby/bin:$PATH\n' >> /etc/bash.bashrc
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
 
-RUN /usr/local/ruby/bin/gem install dshell -s https://repo.fury.io/silarsis/ -v 0.1.2
 RUN useradd -m -s /usr/local/ruby/bin/dshell -G sudo downlink
 RUN echo 'downlink:password' | chpasswd
+RUN rm -f /etc/update-motd.d/*
+
+ADD id_rsa /home/downlink/.ssh/id_rsa
+ADD id_rsa.pub /home/downlink/.ssh/authorized_keys
+RUN chown -R downlink.downlink /home/downlink/.ssh
+RUN mkdir -p /var/downlink
 
 ONBUILD ADD config.yml /etc/downlink/config.yml
+
+RUN /usr/local/ruby/bin/gem install dshell -s https://repo.fury.io/silarsis/ -v 0.1.5
