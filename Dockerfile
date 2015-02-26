@@ -25,9 +25,6 @@ WORKDIR /usr/local/ruby/local
 RUN chmod g+w /usr/local/ruby/local
 VOLUME /usr/local/ruby
 
-RUN /usr/local/ruby/bin/gem install dshell -s https://repo.fury.io/silarsis/ 
-RUN ln -s /usr/local/ruby/bin/dshell /usr/local/bin/dshell
-
 RUN useradd -m -s /usr/local/bin/dshell -G sudo downlink
 RUN echo 'downlink:password' | chpasswd
 
@@ -38,3 +35,7 @@ RUN echo '\nexport PATH=/usr/local/ruby/bin:$PATH\n' >> /etc/bash.bashrc
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
+
+RUN /usr/local/ruby/bin/gem install dshell -s https://repo.fury.io/silarsis/ -v 0.1.1
+RUN ln -s /usr/local/ruby/bin/dshell /usr/local/bin/dshell
+
