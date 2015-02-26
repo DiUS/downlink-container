@@ -25,7 +25,7 @@ WORKDIR /usr/local/ruby/local
 RUN chmod g+w /usr/local/ruby/local
 VOLUME /usr/local/ruby
 
-RUN gem install dshell -s https://repo.fury.io/silarsis/ -n /usr/local/bin
+RUN /usr/local/ruby/bin/gem install dshell -s https://repo.fury.io/silarsis/ -n /usr/local/bin
 
 RUN useradd -m -s /usr/local/bin/dshell -G sudo downlink
 RUN echo 'downlink:password' | chpasswd
