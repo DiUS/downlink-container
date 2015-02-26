@@ -2,10 +2,12 @@ FROM ubuntu:trusty
 MAINTAINER Kevin Littlejohn <kevin@littlejohn.id.au>
 RUN apt-get -yq update && apt-get -yq upgrade \
   && apt-get -yq install autoconf bison build-essential libssl-dev libyaml-dev \
-    libreadline6-dev zlib1g-dev libncurses5-dev curl git openssl
+    libreadline6-dev zlib1g-dev libncurses5-dev curl git openssl \
+    openssh-client openssh-server
 
 # Ruby
 WORKDIR /usr/local/src
+
 RUN git clone https://github.com/sstephenson/ruby-build.git \
   && cd ruby-build \
   && ./install.sh
@@ -18,8 +20,17 @@ RUN addgroup ruby \
   && chgrp -R ruby /usr/local/ruby \
   && chmod -R g+w /usr/local/ruby \
   && find /usr/local/ruby -type d -exec chmod g+s {} \;
-ADD Gemfile /usr/local/ruby/local/Gemfile
+
 WORKDIR /usr/local/ruby/local
-RUN chmod g+w /usr/local/ruby/local \
-  && /usr/local/ruby/bin/bundle install
+RUN chmod g+w /usr/local/ruby/local
 VOLUME /usr/local/ruby
+
+RUN useradd -m -s /bin/bash -G sudo downlink
+RUN echo 'downlink:password' | chpasswd
+
+RUN mkdir /var/run/sshd
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+RUN echo '\nAllowUsers downlink\n' >> /etc/ssh/sshd_config
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
